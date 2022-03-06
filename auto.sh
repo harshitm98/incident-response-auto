@@ -1,6 +1,9 @@
+OUTPUT=output
+cd $OUTPUT
+
 ### OS Version ###
-uname -a
-cat /etc/os-release
+uname -a >> os_version.txt
+cat /etc/os-release >> os_version.txt
 
 ### Gettings users with directories lists ###
 ls /home > users.txt
@@ -20,7 +23,6 @@ mkdir root
 cat /root/.bash_history > root/bash_history_root.txt
 
 ### log files ###
-# https://lazarov.tech/linux-incident-response-part-1/
 mkdir logs
 
 # auth.log
