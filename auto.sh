@@ -10,12 +10,14 @@ mv users_cleaned.txt users.txt
 
 ### Bash history ###
 for user in $(cat users.txt)
+mkdir $user
 do
-	cat /home/$user/.bash_history > bash_history_$user.txt
+	cat /home/$user/.bash_history > $user/bash_history_$user.txt
 done
 
 ## root user's bash history
-cat /root/.bash_history > bash_history_root.txt
+mkdir root
+cat /root/.bash_history > root/bash_history_root.txt
 
 ### log files ###
 # https://lazarov.tech/linux-incident-response-part-1/
@@ -34,20 +36,20 @@ last -f /var/log/btmp > logs/btmp_logs.txt
 
 ### Get browser information... ###
 # Firefox
-mkdir firefox_data
 for user in $(cat users.txt)
-mkdir firefox_data/$user
+mkdir $user/firefox_data
 do
 	## places.sqlite -> Firefox history
-	find /home/$user/.mozilla/ -name places.sqlite >> firefox_data/$user/places_db_$user.txt
-	mkdir firefox_data/$user/history
-	for place in $(cat firefox_data/$user/places_db_$user.txt)
+	find /home/$user/.mozilla/ -name places.sqlite >> $user/firefox_data/places_db_$user.txt
+	mkdir $user/firefox_data/history
+	for place in $(cat $user/firefox_data/places_db_$user.txt)
 	do
 		# copies all places_.sqlite file and renames them according through their profile...
-		cp $place firefox_data/$user/history/$(cat firefox_data/$user/places_db_$user.txt | grep $place | awk -F"/" '{print $6}')_places.sqlite
-        #
-        #
-        #
+		cp $place $user/firefox_data/history/$(cat $user/firefox_data/places_db_$user.txt | grep $place | awk -F"/" '{print $6}')_places.sqlite
+		for database in $(find $user/firefox_data/history/)
+		do
+        	sqlite3 $database "select h.visit_date,p.url from moz_historyvisits as h, moz_places as p where p.id == h.place_id order by h.visit_date" >> $user/firefox_data/history/$database_history.txt
+		done
 	done
 
 	## 

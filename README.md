@@ -4,6 +4,6 @@ This simple script aims to automate early stages of an incident response for Lin
 
 Run the script using bash as a root user:
 ```bash
-# bash auto.sh 
+bash auto.sh 
 ```
 
