@@ -1,4 +1,4 @@
-rm -rf ./auto_script_output > /dev/null
+rm -rf ./auto_script_output 2>/dev/null
 
 OUTPUT=auto_script_output
 MNT_LOCATION=/
@@ -29,6 +29,12 @@ ls -l $MNT_LOCATION/etc/ssh/ssh_host_*_key | awk -F" " 'NR==1{print $6"-"$7" "$8
 ### Static IP addresses ###
 cat $MNT_LOCATION/etc/hosts >> static_ip_addresses.txt
 
+### Get live data
+if [ "$MNT_LOCATION" = "/" ];then
+	ps -auwx >> running_processes.txt
+	echo "==== Netstat ====\n" >> active_connections.txt; netstat -antp >> active_connections.txt
+	echo "\n\n==== SS ====\n" >> active_connections.txt; ss -tulpn >> active_connections.txt
+fi
 
 ### Gettings users with directories lists ###
 # users with bash
@@ -121,6 +127,19 @@ if [ "$MNT_LOCATION" = "/" ];then
 	crontab -l -u $user> scheduled_tasks_crontab.txt
 fi
 
+## crontab
+cat $MNT_LOCATION/etc/crontab >> list_cronjobs.txt
+
+## users cronjobs 
+find $MNT_LOCATION/var/spool/cron/crontabs/ -type f -print -exec cat {} \; >> listed_user_cronjobs.txt
+
+## all other cronjobs
+find $MNT_LOCATION/etc/cron.d -type f -print -exec cat {} \; >> listed_cron.d.txt
+find $MNT_LOCATION/etc/cron.daily -type f -print -exec cat {} \; >> listed_cron.daily.txt
+find $MNT_LOCATION/etc/cron.hourly -type f -print -exec cat {} \; >> listed_cron.hourly.txt
+find $MNT_LOCATION/etc/cron.weekly -type f -print -exec cat {} \; >> listed_cron.weekly.txt
+
+
 ### Latest modified/created files init.d/
 ls -lt $MNT_LOCATION/etc/init.d/ | awk -F" " '{print $6"-"$7" "$8":\t"$9}' | grep -v "\- :" > startup_files_initd_recently_modified.txt
 
@@ -133,6 +152,17 @@ done
 
 # root SSH
 cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys
+
+### Dump "interesting" files
+
+# Files owned by user root
+find / -perm -4000 -user root -type f >> files_owned_by_root.txt
+
+# Checks for SGID files
+find / -perm /6000 -type f >> files_sgid.txt
+
+# Checks for files updated within last 7 days
+find / -mtime -7 -o -ctime -7 >> files_updated_recently.txt
 
 ### Dump hashes of all the files
 find $MNT_LOCATION/ -type f -exec md5sum {} \; >> hashes_of_all_files.txt
