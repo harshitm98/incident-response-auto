@@ -124,7 +124,7 @@ fi
 
 ### Crontab and scheduled tasks ###
 if [ "$MNT_LOCATION" = "/" ];then
-	crontab -l -u $user> scheduled_tasks_crontab.txt
+	crontab -l -u $user> list_scheduled_tasks_crontab.txt
 fi
 
 ## crontab
@@ -156,13 +156,13 @@ cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys
 ### Dump "interesting" files
 
 # Files owned by user root
-find / -perm -4000 -user root -type f >> files_owned_by_root.txt
+find $MNT_LOCATION/ -perm -4000 -user root -type f >> files_owned_by_root.txt
 
 # Checks for SGID files
-find / -perm /6000 -type f >> files_sgid.txt
+find $MNT_LOCATION/ -perm /6000 -type f >> files_sgid.txt
 
 # Checks for files updated within last 7 days
-find / -mtime -7 -o -ctime -7 >> files_updated_recently.txt
+find $MNT_LOCATION/ -mtime -7 -o -ctime -7 >> files_updated_recently.txt
 
 ### Dump hashes of all the files
 find $MNT_LOCATION/ -type f -exec md5sum {} \; >> hashes_of_all_files.txt
