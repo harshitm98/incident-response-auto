@@ -1,60 +1,75 @@
 rm -rf ./auto_script_output > /dev/null
 
 OUTPUT=auto_script_output
+MNT_LOCATION=/
+
+while getopts "o:m:" opt; do
+  case $opt in
+    o) OUTPUT="$OPTARG";;
+    m) MNT_LOCATION="$OPTARG";;
+    \?) echo "Invalid option -$OPTARG" >&2
+    ;;
+  esac
+done
+
 mkdir $OUTPUT
 cd $OUTPUT
 
+
+
 ### OS Version ###
-uname -a >> os_version.txt
-cat /etc/os-release >> os_version.txt
+if [ "$MNT_LOCATION" = "/" ];then
+	uname -a >> os_version.txt
+fi
+cat $MNT_LOCATION/etc/os-release >> os_version.txt
 
 ### Host Installation time ###
-ls -l /etc/ssh/ssh_host_*_key | awk -F" " 'NR==1{print $6"-"$7" "$8}' >> potential_os_installation_date.txt
+ls -l $MNT_LOCATION/etc/ssh/ssh_host_*_key | awk -F" " 'NR==1{print $6"-"$7" "$8}' >> potential_os_installation_date.txt
 
 ### Static IP addresses ###
-cat /etc/hosts >> static_ip_addresses.txt
+cat $MNT_LOCATION/etc/hosts >> static_ip_addresses.txt
 
 
 ### Gettings users with directories lists ###
 # users with bash
-cat /etc/passwd | grep bash | grep -v root | awk -F":" '{print $1}' > users.txt
+cat $MNT_LOCATION/etc/passwd | grep bash | grep -v root | awk -F":" '{print $1}' > users.txt
 
 # users in /home
-ls /home >> users.txt
+ls $MNT_LOCATION/home >> users.txt
 
 # cleanup
 cat users.txt | sort -u > users1.txt
 mv users1.txt users.txt
 
 ### Users with SUID=0
-cat /etc/passwd | grep :0: >> users_suid_eq_0.txt
+cat $MNT_LOCATION/etc/passwd | grep :0: >> users_suid_eq_0.txt
 
 ### Users who can run sudo
-cat /etc/group | grep '^sudo:.*$' | awk -F":" '{print $NF}' >> users_sudo.txt
+cat $MNT_LOCATION/etc/group | grep '^sudo:.$MNT_LOCATION*$' | awk -F":" '{print $NF}' >> users_sudo.txt
 
 ### Bash history ###
 for user in $(cat users.txt)
 do
 	mkdir $user
-	cat /home/$user/.bash_history > $user/bash_history_$user.txt
+	cat $MNT_LOCATION/home/$user/.bash_history > $user/bash_history_$user.txt
 done
 
 ## root user's bash history
 mkdir root
-cat /root/.bash_history > root/bash_history_root.txt
+cat $MNT_LOCATION/root/.bash_history > root/bash_history_root.txt
 
 ### log files ###
 mkdir logs
 
 # auth.log
-cat /var/log/auth.log | grep -a "COMMAND" > logs/auth_commands.log
+cat $MNT_LOCATION/var/log/auth.log | grep -a "COMMAND" > logs/auth_commands.log
 ### /var/log/secure
 ### /var/log/audit/audit.log
 
 # wtmp, utmp and btmp logs
-last -f /var/log/wtmp > logs/wtmp_logs.txt
-last -f /var/log/utmp > logs/utmp_logs.txt
-last -f /var/log/btmp > logs/btmp_logs.txt
+last -f $MNT_LOCATION/var/log/wtmp > logs/wtmp_logs.txt
+last -f $MNT_LOCATION/var/log/utmp > logs/utmp_logs.txt
+last -f $MNT_LOCATION/var/log/btmp > logs/btmp_logs.txt
 
 
 ### Get browser information... ###
@@ -63,7 +78,7 @@ for user in $(cat users.txt)
 do
 	mkdir $user/firefox_data
 	## places.sqlite -> Firefox history
-	find /home/$user/.mozilla/ -name places.sqlite >> $user/firefox_data/places_db_$user.txt
+	find $MNT_LOCATION/home/$user/.mozilla/ -name places.sqlite >> $user/firefox_data/places_db_$user.txt
 	mkdir $user/firefox_data/browsing_history
 	for place in $(cat $user/firefox_data/places_db_$user.txt)
 	do
@@ -82,28 +97,42 @@ done
 
 
 ### tmp directory ###
-find /tmp > tmp_directory_list.txt
+find $MNT_LOCATION/tmp > tmp_directory_list.txt
 #... maybe cat out the data (?)
 
 ### currently loggedon users ###
-who > users_loggedon.txt
-w > users_loggedon_moreinfo.txt
+if [ "$MNT_LOCATION" = "/" ];then
+	who > users_loggedon.txt
+	w > users_loggedon_moreinfo.txt
+fi
 
 ### users login history ###
-last > users_login_history.txt
+if [ "$MNT_LOCATION" = "/" ];then
+	last > users_login_history.txt
+fi
 
 ### Opened files ###
-lsof > opened_files.txt
+if [ "$MNT_LOCATION" = "/" ];then
+	lsof > opened_files.txt
+fi
 
 ### Crontab and scheduled tasks ###
-crontab -l -u $user> scheduled_tasks_crontab.txt
+if [ "$MNT_LOCATION" = "/" ];then
+	crontab -l -u $user> scheduled_tasks_crontab.txt
+fi
 
 ### Latest modified/created files init.d/
-ls -lt /etc/init.d/ | awk -F" " '{print $6"-"$7" "$8":\t"$9}' | grep -v "\- :" > startup_files_initd_recently_modified.txt
+ls -lt $MNT_LOCATION/etc/init.d/ | awk -F" " '{print $6"-"$7" "$8":\t"$9}' | grep -v "\- :" > startup_files_initd_recently_modified.txt
 
 ### SSH files (authorized_keys entries)
 for user in $(cat users.txt)
 do
 	mkdir $user/ssh_files
-	cat /home/$user/.ssh/authorized_keys > $user/ssh_files/authorized_keys
+	cat $MNT_LOCATION/home/$user/.ssh/authorized_keys > $user/ssh_files/authorized_keys
 done
+
+# root SSH
+cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys
+
+### Dump hashes of all the files
+find $MNT_LOCATION/ -type f -exec md5sum {} \; >> hashes_of_all_files.txt
