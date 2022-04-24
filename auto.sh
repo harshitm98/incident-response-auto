@@ -126,7 +126,7 @@ fi
 
 ### Crontab and scheduled tasks ###
 if [ "$MNT_LOCATION" = "/" ];then
-	crontab -l -u $user> list_scheduled_tasks_crontab.txt
+	crontab -l -u $user >> list_scheduled_tasks_crontab_$user.txt
 fi
 
 ## crontab
@@ -167,4 +167,4 @@ find $MNT_LOCATION/ -perm /6000 -type f >> files_sgid.txt
 find $MNT_LOCATION/ -mtime -7 -o -ctime -7 >> files_updated_recently.txt
 
 ### Dump hashes of all the files
-find $MNT_LOCATION/ -type f -exec md5sum {} \; >> hashes_of_all_files.txt
+find $MNT_LOCATION/ -type f -exec md5sum {} >> hashes_of_all_files.txt \; 2> /dev/null
