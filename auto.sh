@@ -32,8 +32,10 @@ cat $MNT_LOCATION/etc/hosts >> static_ip_addresses.txt
 ### Get live data
 if [ "$MNT_LOCATION" = "/" ];then
 	ps -auwx >> running_processes.txt
-	echo "==== Netstat ====\n" >> active_connections.txt; netstat -antp >> active_connections.txt
-	echo "\n\n==== SS ====\n" >> active_connections.txt; ss -tulpn >> active_connections.txt
+	# echo "==== Netstat ====\n" >> active_connections.txt;
+	netstat -antp >> active_connections_netstat.txt
+	echo "\n\n==== SS ====\n" >> active_connections_ss.txt; 
+	ss -tulpn >> active_connections_ss.txt
 fi
 
 ### Gettings users with directories lists ###
