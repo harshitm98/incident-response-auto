@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from notion.client import NotionClient
 from notion.block import PageBlock
 from md2notion.upload import upload
@@ -173,8 +175,8 @@ def create_md_file(folder_location, report_title):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="report_generator.py", 
                                     description="A Python script to upload the output folder of auto.sh to your Notion workspace",
-                                    usage='%(prog)s -f <files to be uploaded> -o <output file>')
+                                    usage='%(prog)s -f <files to be uploaded> -t <Report Title>')
     parser.add_argument("-f", "--folderlocation", help="Folder location", required=True)
-    parser.add_argument("-o", "--output", help="Output file", required=True)
+    parser.add_argument("-t", "--title", help="Report Title", required=True)
     arguments = parser.parse_args()
-    create_md_file(arguments.folderlocation, arguments.output)
+    create_md_file(arguments.folderlocation, arguments.title)
