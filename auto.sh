@@ -161,7 +161,7 @@ fi
 ### Opened files ###
 if [ "$MNT_LOCATION" = "/" ];then
 	echo -n "Finding recently opened files..."
-	lsof > opened_files.txt
+	lsof > opened_files.txt 2> /dev/null
 	echo " Done."
 fi
 
@@ -199,7 +199,7 @@ do
 done
 
 # root SSH
-cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys 2> /dev/null
+cat $MNT_LOCATION/root/.ssh/authorized_keys > root/authorized_keys 2> /dev/null
 echo " Done."
 
 ### Dump "interesting" files
