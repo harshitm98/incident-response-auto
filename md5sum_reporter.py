@@ -1,11 +1,15 @@
-import requests, time
+import requests, time, json
 
 hashes_file = {}
 
 with open("test.txt", "r") as f:
     hashes_list = f.read().split("\n")
 
-vtkeys = ["570480f666a9b4a23afd05f42f4bf9878b90d10ef2427f5b2e885c4f4a3fe19b"]
+with open("config.json", "r") as f:
+    config = json.loads(f.read())
+
+
+vtkeys = config["virustotal_api_keys"]
 vt_key_counter = 0
 
 for hashes in hashes_list:
