@@ -78,11 +78,18 @@ def create_md_file(folder_location, report_title):
     ### Users on the system
     report_contents = update_report_contents(report_contents, "users.txt", folder_location, section_title="Users on the system")
 
+    ### All users on system
+    report_contents = update_report_contents(report_contents, "users_all.txt", folder_location, section_title="All users on the system")
+
     ### Users with SUID bit set to 0
     report_contents = update_report_contents(report_contents, "users_suid_eq_0.txt", folder_location, section_title="", section_sub_title="Users with SUID bit set to 0")
 
     ### Users who can run sudo
     report_contents = update_report_contents(report_contents, "users_sudo.txt", folder_location, section_title="", section_sub_title="Users who can run sudo")
+
+    ### Commands that users can run as sudo
+    report_contents = update_report_contents(report_contents, "users_sudo_list.txt", folder_location, section_title="", section_sub_title="Commands that users can run as sudo")
+
  
     ### Bash history of the users
     report_contents = add_header(report_contents, "User data")
@@ -114,6 +121,8 @@ def create_md_file(folder_location, report_title):
 
     ### Logs
     report_contents = add_header(report_contents, "Logs")
+
+    report_contents = update_report_contents(report_contents, "logs/auth_commands.log", folder_location, section_title="", section_sub_title="Commands run as sudo")
 
     report_contents = update_report_contents(report_contents, "logs/auth_commands.log", folder_location, section_title="", section_sub_title="Commands run as sudo")
 
@@ -160,7 +169,7 @@ def create_md_file(folder_location, report_title):
 
     report_contents = update_report_contents(report_contents, "files_sgid.txt", folder_location, section_title="", section_sub_title="Checks for SGID files")
 
-    report_contents = update_report_contents(report_contents, "files_updated_recently.txt", folder_location, section_title="", section_sub_title="Checks for files updated within last 7 days")
+    # report_contents = update_report_contents(report_contents, "files_updated_recently.txt", folder_location, section_title="", section_sub_title="Checks for files updated within last 7 days")
     
     report_contents = update_report_contents(report_contents, "tmp_directory_list.txt", folder_location, section_title="", section_sub_title="Files in /tmp directory")
 

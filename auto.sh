@@ -45,7 +45,6 @@ if [ "$MNT_LOCATION" = "/" ];then
 	# echo "==== Netstat ====\n" >> active_connections.txt;
 	echo -n "netstat done... "
 	netstat -antp >> active_connections_netstat.txt
-	echo "\n\n==== SS ====\n" >> active_connections_ss.txt; 
 	ss -tulpn >> active_connections_ss.txt
 	echo "ss done."
 fi
