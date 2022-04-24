@@ -118,7 +118,7 @@ for user in $(cat users.txt)
 do
 	mkdir $user/firefox_data
 	## places.sqlite -> Firefox history
-	find $MNT_LOCATION/home/$user/.mozilla/ -name places.sqlite >> $user/firefox_data/places_db_$user.txt
+	find $MNT_LOCATION/home/$user/.mozilla/ -name places.sqlite >> $user/firefox_data/places_db_$user.txt 2> /dev/null
 	mkdir $user/firefox_data/browsing_history
 	for place in $(cat $user/firefox_data/places_db_$user.txt)
 	do
@@ -195,24 +195,24 @@ echo -n "Finding users SSH files..."
 for user in $(cat users.txt)
 do
 	mkdir $user/ssh_files
-	cat $MNT_LOCATION/home/$user/.ssh/authorized_keys > $user/ssh_files/authorized_keys
+	cat $MNT_LOCATION/home/$user/.ssh/authorized_keys > $user/ssh_files/authorized_keys 2> /dev/null
 done
 
 # root SSH
-cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys
+cat $MNT_LOCATION/root/.ssh/authorized_keys > root/ssh_files/authorized_keys 2> /dev/null
 echo " Done."
 
 ### Dump "interesting" files
 
 echo -n "Finding 'interesting' files ..."
 # Files owned by user root
-find $MNT_LOCATION/ -perm -4000 -user root -type f >> files_owned_by_root.txt
+find $MNT_LOCATION/ -perm -4000 -user root -type f >> files_owned_by_root.txt 2> /dev/null
 
 # Checks for SGID files
-find $MNT_LOCATION/ -perm /6000 -type f >> files_sgid.txt
+find $MNT_LOCATION/ -perm /6000 -type f >> files_sgid.txt 2> /dev/null
 
 # Checks for files updated within last 7 days
-find $MNT_LOCATION/ -mtime -7 -o -ctime -7 >> files_updated_recently.txt
+find $MNT_LOCATION/ -mtime -7 -o -ctime -7 >> files_updated_recently.txt 2> /dev/null
 
 echo " Done."
 
