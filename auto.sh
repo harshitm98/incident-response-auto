@@ -1,3 +1,5 @@
+#!/bin/sh
+
 rm -rf ./auto_script_output 2>/dev/null
 
 OUTPUT=auto_script_output
@@ -188,6 +190,11 @@ echo " done."
 ### Latest modified/created files init.d/
 echo -n "Finding recently modified files in init.d..."
 ls -lt $MNT_LOCATION/etc/init.d/ | awk -F" " '{print $6"-"$7" "$8":\t"$9}' | grep -v "\- :" > startup_files_initd_recently_modified.txt
+echo " done."
+
+### Latest modified/created files systemd/
+echo -n "Finding recently modified files in systemd..."
+ls -lt $MNT_LOCATION/etc/systemd/system | awk -F" " '{print $6"-"$7" "$8":\t"$9}' | grep -v "\- :" > startup_files_systemd_recently_modified.txt
 echo " done."
 
 ### SSH files (authorized_keys entries)
