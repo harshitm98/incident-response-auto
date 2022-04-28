@@ -170,7 +170,10 @@ fi
 ### Crontab and scheduled tasks ###
 echo -n "Finding all cronjobs..."
 if [ "$MNT_LOCATION" = "/" ];then
-	crontab -l -u $user >> list_scheduled_tasks_crontab_$user.txt 2> /dev/null
+	for user in $(cat users.txt)
+	do	
+		crontab -l -u $user >> list_scheduled_tasks_crontab_$user.txt 2> /dev/null
+	done
 fi
 
 ## crontab

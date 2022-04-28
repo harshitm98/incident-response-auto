@@ -1,3 +1,4 @@
 config.json
 *.elf
 venv/*
+auto_script_output/*
